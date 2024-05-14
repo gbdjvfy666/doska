@@ -33,10 +33,35 @@ class UserProfile(models.Model):
 
 class Question(models.Model):
     title = models.CharField(max_length=200)
-    content = models.TextField()
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    category_choices = [
+        ('tank', 'Танки'),
+        ('healer', 'Хилы'),
+        ('dd', 'ДД'),
+        ('trader', 'Торговцы'),
+        ('guild_master', 'Гилдмастеры'),
+        ('quest_giver', 'Квестгиверы'),
+        ('blacksmith', 'Кузнецы'),
+        ('leatherworker', 'Кожевники'),
+        ('potion_maker', 'Зельевары'),
+        ('spell_master', 'Мастера заклинаний'),
+    ]
+    category = models.CharField(max_length=20, choices=category_choices)
 
     def __str__(self):
         return self.title
+    
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.text
+
     
 class Announcement(models.Model):
     title = models.CharField(max_length=200)

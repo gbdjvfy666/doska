@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список объявлений</title>
+    <!-- Подключите необходимые CSS, например Bootstrap, если требуется -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Список объявлений</h1>
+        {% if announcements %}
+            <div class="list-group">
+                {% for announcement in announcements %}
+                    <a href="{% url 'announcement_detail' announcement.pk %}" class="list-group-item list-group-item-action">
+                        <h5 class="mb-1">{{ announcement.title }}</h5>
+                        <p class="mb-1">{{ announcement.content|truncatewords:20 }}</p>
+                        <small>Категория: {{ announcement.get_category_display }}</small>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Нет объявлений.</p>
+        {% endif %}
+    </div>
+    <!-- Подключите необходимые JS, например jQuery и Bootstrap JS, если требуется -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
