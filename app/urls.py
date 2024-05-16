@@ -11,6 +11,8 @@ from .views import confirm_email
 from django.urls import path
 from .views import register_user, confirm_email
 from .views import AcceptResponseView, ResponseDeleteView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('register/', register_user, name='register_user'),
@@ -27,4 +29,4 @@ urlpatterns = [
     path('response/<int:pk>/delete/', ResponseDeleteView.as_view(), name='response-delete'),
     path('response/<int:pk>/accept/', AcceptResponseView.as_view(), name='response-accept'),
     path('categories/', CategoryListView.as_view(), name='categories_list'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

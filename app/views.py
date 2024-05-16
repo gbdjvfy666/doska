@@ -101,36 +101,31 @@ def confirm_email(request, uidb64, token):
         return HttpResponse('Ссылка для подтверждения недействительна или срок её действия истёк')
 
 
-class AnnouncementCreateView(CreateView): 
+class AnnouncementCreateView(CreateView):
     model = Announcement
-    fields = ['title', 'content', 'category']
-    template_name = 'announcements/create.html' # доделать
+    fields = ['title', 'content', 'category', 'image', 'video_url']
+    template_name = 'announcements/create.html'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-
 class AnnouncementUpdateView(UpdateView):
     model = Announcement
-    fields = ['title', 'content', 'category']
-    template_name = 'announcements/update.html' # доделать
+    fields = ['title', 'content', 'category', 'image', 'video_url']
+    template_name = 'announcements/update.html'
 
     def get_queryset(self):
         return self.model.objects.filter(author=self.request.user)
-
-
-
+    
 class AnnouncementListView(ListView):
     model = Announcement
-    template_name = 'announcements/list.html' # доделать
+    template_name = 'announcements/list.html'
     context_object_name = 'announcements'
-
-
 
 class AnnouncementDetailView(DetailView):
     model = Announcement
-    template_name = 'announcements/detail.html' # Доделать
+    template_name = 'announcements/detail.html'
     context_object_name = 'announcement'
 
 class ResponseAcceptView(View):
