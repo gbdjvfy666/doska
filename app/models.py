@@ -28,9 +28,6 @@ class Response(models.Model):
     def __str__(self):
         return f'Response to {self.ad.title}'
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
 class Question(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
@@ -52,7 +49,7 @@ class Question(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices')
     text = models.TextField()
@@ -61,21 +58,20 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.text
-    
+
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
-    
+
 class Announcement(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     content = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
     video_url = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return self.title
-    
