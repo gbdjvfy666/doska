@@ -4,7 +4,7 @@
 <h1>Привет</h1>
 {% if user.is_authenticated %}
 
-    <p>Добро пожаловать {{ user.username }} !!!</p>
+    <p>Добро пожаловать на доску обьявлений{{ user.username }} !!!</p>
 {% else %}
     <a href="{% url 'account_signup' %}">Зарегистрируйтесь по почте</a>
 {% endif %}
