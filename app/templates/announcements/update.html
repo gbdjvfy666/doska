@@ -50,6 +50,8 @@
     <div class="container">
         <h1>{{ announcement.title }}</h1>
         <p>{{ announcement.content }}</p>
+        <p>{{ ad.description }}</p>
+        <a href="{% url 'edit_ad' ad.id %}">Редактировать</a>
         <p>Категория: {{ announcement.category }}</p>
         <!-- Добавьте другие поля объявления, если требуется -->
         {% if user == announcement.author %}
@@ -62,4 +64,5 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html>
+
+

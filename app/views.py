@@ -219,18 +219,27 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-def post_edit(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
 
-    if request.method == 'GET':
-        if request.user is not post.author:
-            return redirect('post', post_id=post.id)
-        form = PostForm(instance=post)
 
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Ad  
+from .form import AdForm
+
+def edit_ad(request, ad_id):
+    ad = get_object_or_404(Ad, id=ad_id)
     if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
+        form = AdForm(request.POST, instance=ad)
         if form.is_valid():
             form.save()
-        return redirect('post', post_id=post.id)
+            return redirect('announcement-list', ad_id=ad.id)  
+    else:
+        form = AdForm(instance=ad)
+    return render(request, 'app/edit_ad.html', {'form': form, 'ad': ad})
 
-    return render(request, 'create_or_update_post.html', {'form': form, 'post': post})
+def mass_sender(request):
+    if request.user in Category.subscribers.all():
+        send_mail(
+            subject=f'Hi {request.user}, we have some news for you!',
+            message=f'{Post.all()[-1].text}',
+            from_email='azizauauau@yandex.ru',
+            recipient_list=['imfyashya@gmail.com'])

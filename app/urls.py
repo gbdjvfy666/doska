@@ -23,5 +23,6 @@ urlpatterns = [
     path('user/responses/', UserResponsesListView.as_view(), name='user-responses'),
     path('response/<int:pk>/delete/', ResponseDeleteView.as_view(), name='response-delete'),
     path('response/<int:pk>/accept/', ResponseAcceptView.as_view(), name='response-accept'),
+    path('ad/<int:ad_id>/edit/', views.edit_ad, name='edit_ad'),
     path('categories/', CategoryListView.as_view(), name='categories_list'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

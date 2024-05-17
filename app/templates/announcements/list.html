@@ -118,6 +118,7 @@
 
         {% if user == announcement.author %}
             <a href="{% url 'announcement_update' announcement.pk %}" class="edit-button">Редактировать</a>
+            <a href="{% url 'edit_ad' ad.id %}">Редактировать</a>
         {% endif %}
         {% comment %} <a href="{% url 'announcement-list' %}" class="back-button">Назад к списку</a> {% endcomment %}
     </div>
