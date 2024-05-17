@@ -15,7 +15,11 @@ from django.utils.html import strip_tags
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse, reverse_lazy
-
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Response
+from .form import ResponseForm
 from .form import AnnouncementForm, UserRegistrationForm
 from .models import Announcement, Response, Category, Question, Choice
 from .utils import send_confirmation_mail
@@ -116,21 +120,20 @@ class AnnouncementDetailView(DetailView):
     template_name = 'announcements/detail.html'
     context_object_name = 'announcement'
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class ResponseCreateView(CreateView):
+class ResponseCreateView(LoginRequiredMixin, CreateView):
     model = Response
-    fields = ['text']
-    template_name = 'responses/create.html'
+    form_class = ResponseForm
+    template_name = 'response_form.html'
 
     def form_valid(self, form):
-        form.instance.author = self.request.user
-        form.instance.announcement_id = self.kwargs['announcement_id']
+        form.instance.user = self.request.user
+        form.instance.ad_id = self.kwargs['ad_id']
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['announcement'] = Announcement.objects.get(pk=self.kwargs['announcement_id'])
-        return context
+    def get_success_url(self):
+        return reverse_lazy('announcement-detail', kwargs={'pk': self.kwargs['ad_id']})
 
 class ResponseAcceptView(View):
     def get(self, request, pk):
@@ -243,3 +246,31 @@ def mass_sender(request):
             message=f'{Post.all()[-1].text}',
             from_email='azizauauau@yandex.ru',
             recipient_list=['imfyashya@gmail.com'])
+        
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Ad, Response
+from .form import AdForm, ResponseForm
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def create_response(request, ad_id):
+    ad = get_object_or_404(Ad, id=ad_id)
+    if request.method == 'POST':
+        form = ResponseForm(request.POST)
+        if form.is_valid():
+            response = form.save(commit=False)
+            response.user = request.user
+            response.ad = ad
+            response.save()
+            return redirect('ad_detail', ad_id=ad.id)  
+    else:
+        form = ResponseForm()
+    return render(request, 'create_response.html', {'form': form, 'ad': ad})
+
+def ad_detail(request, ad_id):
+    ad = get_object_or_404(Ad, id=ad_id)
+    responses = ad.responses.all()
+    return render(request, 'ad_detail.html', {'ad': ad, 'responses': responses})

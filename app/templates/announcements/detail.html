@@ -1,3 +1,5 @@
+<!-- templates/announcement_detail.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,26 +7,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ announcement.title }}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <img src="{{ announcement.image.url }}" alt="Изображение объявления">
-
 </head>
 <body>
     <div class="container">
         <h1>{{ announcement.title }}</h1>
         <p>{{ announcement.content }}</p>
         <p>Категория: {{ announcement.category }}</p>
-        
-        {% if user == announcement.author %}
-        <h2>Редактировать объявление</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-        </form>
+
+        {% if user == announcement.user %}
+        <a href="{% url 'announcement_update' announcement.pk %}" class="btn btn-warning">Редактировать объявление</a>
         {% endif %}
         
         <a href="{% url 'announcement-list' %}" class="btn btn-secondary">Назад к списку</a>
 
+        <h2>Отклики</h2>
+        {% for response in announcement.responses.all %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <p>{{ response.content }}</p>
+                    <p><small>Автор: {{ response.user.username }}, Дата: {{ response.created_at }}</small></p>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+        <h2>Оставить отклик</h2>
+        <form method="post" action="{% url 'response-create' announcement.pk %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Отправить отклик</button>
+        </form>
+        {% else %}
+        <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a> чтобы оставить отклик.</p>
+        {% endif %}
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>

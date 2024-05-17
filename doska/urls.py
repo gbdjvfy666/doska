@@ -26,5 +26,4 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path("", TemplateView.as_view(template_name="app/home.html"), name="home"),
     path('accounts/', include('allauth.urls')),
-    path('profile/', profile_view, name='profile'),
 ]

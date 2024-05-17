@@ -26,6 +26,7 @@ class Ad(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
+
     def __str__(self):
         return self.title
 
@@ -35,6 +36,7 @@ class Response(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    content = models.TextField()
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='responses')
 
     def __str__(self):
@@ -103,3 +105,4 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
