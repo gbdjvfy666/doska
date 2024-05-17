@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from .views import (
     AnnouncementListView, AnnouncementDetailView, AnnouncementCreateView, 
     AnnouncementUpdateView, ResponseCreateView, UserResponsesListView,
-    ResponseDeleteView, ResponseAcceptView, CategoryListView, 
+    ResponseDeleteView, ResponseAcceptView, CategoryListView, profile_view, 
     register_user, confirm_email, vote
 )
 from app import views

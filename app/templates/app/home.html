@@ -27,13 +27,38 @@
             background-color: #45a049;
         }
     </style>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Доска объявлений</h1>
         {% if user.is_authenticated %}
             <p>Добро пожаловать на доску объявлений, {{ user.username }}!</p>
             <a href="{% url 'announcement-create' %}" class="button">Создать объявление</a>
+            <a href="{% url 'announcement-list' %}" class="button">Перейти к списку объявлений</a>
+            <a href="{% url 'profile' %}" class="button">Мой профиль</a>
+
         {% else %}
             <p>Пожалуйста, <a href="{% url 'account_signup' %}">зарегистрируйтесь</a>, чтобы создать объявление.</p>
         {% endif %}

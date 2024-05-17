@@ -3,44 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Детали объявления</title>
-    <!-- Подключите необходимые CSS, например Bootstrap, если требуется -->
+    <title>{{ announcement.title }}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <img src="{{ announcement.image.url }}" alt="Изображение объявления">
+
 </head>
 <body>
     <div class="container">
         <h1>{{ announcement.title }}</h1>
-        <div class="mb-3">
-            <small>Категория: {{ announcement.get_category_display }}</small>
-        </div>
-        <div>
-            <p>{{ announcement.content }}</p>
-        </div>
-        <!-- Добавьте раздел для изображений, если они предусмотрены -->
-        {% if announcement.images %}
-            <div class="images">
-                {% for image in announcement.images.all %}
-                    <img src="{{ image.url }}" alt="Image" class="img-fluid">
-                {% endfor %}
-            </div>
-        {% endif %}
-        <!-- Добавьте раздел для видео, если они предусмотрены -->
-        {% if announcement.videos %}
-            <div class="videos">
-                {% for video in announcement.videos.all %}
-                    <div class="embed-responsive embed-responsive-16by9">
-                        <iframe class="embed-responsive-item" src="{{ video.url }}" allowfullscreen></iframe>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        <!-- Ссылка для редактирования объявления, если пользователь является автором -->
+        <p>{{ announcement.content }}</p>
+        <p>Категория: {{ announcement.category }}</p>
+        
         {% if user == announcement.author %}
-            <a href="{% url 'announcement_update' announcement.pk %}" class="btn btn-primary">Редактировать</a>
+        <h2>Редактировать объявление</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
         {% endif %}
-        <a href="{% url 'announcement_list' %}" class="btn btn-secondary">Назад к списку</a>
+        
+        <a href="{% url 'announcement-list' %}" class="btn btn-secondary">Назад к списку</a>
     </div>
-    <!-- Подключите необходимые JS, например jQuery и Bootstrap JS, если требуется -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

@@ -1,6 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+
 class AdCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -24,6 +33,7 @@ class Response(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='responses')
 
     def __str__(self):
         return f'Response to {self.ad.title}'
@@ -75,3 +85,7 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title
+    
+from django.db import models
+from django.contrib.auth.models import User
+

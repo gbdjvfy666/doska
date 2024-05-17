@@ -55,7 +55,7 @@
         {% if user == announcement.author %}
             <a href="{% url 'announcement_update' announcement.pk %}" class="edit-button">Редактировать</a>
         {% endif %}
-        <a href="{% url 'announcement_list' %}" class="back-button">Назад к списку</a>
+        <a href="{% url 'announcement-list' %}" class="back-button">Назад к списку</a>
     </div>
     <!-- Подключите необходимые JS, например jQuery и Bootstrap JS, если требуется -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

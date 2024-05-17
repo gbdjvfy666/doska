@@ -23,6 +23,22 @@ from .utils import send_confirmation_mail
 
 User = get_user_model()
 
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+
+def response_list(request):
+    responses = Response.objects.filter(user=request.user)
+    return render(request, 'app/response_list.html', {'responses': responses})
+
+
+def send_response_notification_email(response):
+    subject = 'Уведомление о новом отклике на ваше объявление'
+    message = 'У вас новый отклик на объявление. Проверьте ваш профиль для получения подробностей.'
+    html_message = render_to_string('response_email.html', {'response': response})
+    recipient_list = [response.ad.author.email]
+    send_mail(subject, message, None, recipient_list, html_message=html_message)
+
+
 def register_user(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -178,3 +194,43 @@ def send_notification(user, message):
 def send_response_notification(sender, instance, created, **kwargs):
     if created:
         send_notification(instance.author, 'You have received a new response.')
+
+
+from django.shortcuts import render
+from .models import Profile
+
+def profile_view(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        # If the profile doesn't exist, you can either redirect to a create profile page
+        # or render a different template indicating that the profile doesn't exist.
+        # Here, we'll render a template indicating that the profile doesn't exist.
+        return render(request, 'profile_not_found.html')
+    return render(request, 'profile.html', {'profile': profile})
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+def post_edit(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == 'GET':
+        if request.user is not post.author:
+            return redirect('post', post_id=post.id)
+        form = PostForm(instance=post)
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+        return redirect('post', post_id=post.id)
+
+    return render(request, 'create_or_update_post.html', {'form': form, 'post': post})
