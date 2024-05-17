@@ -16,7 +16,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse, reverse_lazy
 
-from .form import UserRegistrationForm
+from .form import AnnouncementForm, UserRegistrationForm
 from .models import Announcement, Response, Category, Question, Choice
 from .utils import send_confirmation_mail
 
@@ -75,6 +75,7 @@ class AnnouncementCreateView(CreateView):
     model = Announcement
     fields = ['title', 'content', 'category', 'image', 'video_url']
     template_name = 'announcements/create.html'
+    success_url = '/app/'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -82,11 +83,12 @@ class AnnouncementCreateView(CreateView):
 
 class AnnouncementUpdateView(UpdateView):
     model = Announcement
-    fields = ['title', 'content', 'category', 'image', 'video_url']
+    form_class = AnnouncementForm
     template_name = 'announcements/update.html'
-
-    def get_queryset(self):
-        return self.model.objects.filter(author=self.request.user)
+    context_object_name = 'announcement'
+    
+    def get_success_url(self):
+        return reverse('announcement_detail', kwargs={'pk': self.object.pk})
 
 class AnnouncementListView(ListView):
     model = Announcement

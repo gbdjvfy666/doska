@@ -3,18 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редактировать объявление</title>
+    <title>{{ announcement.title }}</title>
     <!-- Подключите необходимые CSS, например Bootstrap, если требуется -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .edit-button {
+            display: inline-block;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            display: inline-block;
+            background-color: #6c757d;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Редактировать объявление</h1>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-        </form>
+        <h1>{{ announcement.title }}</h1>
+        <p>{{ announcement.content }}</p>
+        <p>Категория: {{ announcement.category }}</p>
+        <!-- Добавьте другие поля объявления, если требуется -->
+        {% if user == announcement.author %}
+            <a href="{% url 'announcement_update' announcement.pk %}" class="edit-button">Редактировать</a>
+        {% endif %}
+        <a href="{% url 'announcement_list' %}" class="back-button">Назад к списку</a>
     </div>
     <!-- Подключите необходимые JS, например jQuery и Bootstrap JS, если требуется -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

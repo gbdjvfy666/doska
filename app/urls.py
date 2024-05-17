@@ -8,6 +8,7 @@ from .views import (
     ResponseDeleteView, ResponseAcceptView, CategoryListView, 
     register_user, confirm_email, vote
 )
+from app import views
 
 urlpatterns = [
     path('register/', register_user, name='register_user'),
@@ -17,7 +18,7 @@ urlpatterns = [
     path('', AnnouncementListView.as_view(), name='announcement-list'),
     path('announcement/<int:pk>/', AnnouncementDetailView.as_view(), name='announcement-detail'),
     path('announcement/create/', AnnouncementCreateView.as_view(), name='announcement-create'),
-    path('announcement/<int:pk>/update/', AnnouncementUpdateView.as_view(), name='announcement-update'),
+    path('announcement/<int:pk>/update/', views.AnnouncementUpdateView.as_view(), name='announcement_update'),
     path('announcement/<int:announcement_id>/response/', ResponseCreateView.as_view(), name='response-create'),
     path('user/responses/', UserResponsesListView.as_view(), name='user-responses'),
     path('response/<int:pk>/delete/', ResponseDeleteView.as_view(), name='response-delete'),
