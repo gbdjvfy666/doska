@@ -1,5 +1,3 @@
-<!-- templates/announcement_detail.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,18 +7,20 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
+    <div class="container mt-4">
         <h1>{{ announcement.title }}</h1>
+        {% if announcement.image %}
+            <img src="{{ announcement.image.url }}" alt="{{ announcement.title }}" class="img-fluid mb-3">
+        {% endif %}
         <p>{{ announcement.content }}</p>
-        <p>Категория: {{ announcement.category }}</p>
+        <p>Категория: {{ announcement.category.name }}</p>
 
         {% if user == announcement.user %}
-        <a href="{% url 'announcement_update' announcement.pk %}" class="btn btn-warning">Редактировать объявление</a>
+            <a href="{% url 'announcement_update' announcement.pk %}" class="btn btn-secondary">Редактировать объявление</a>
         {% endif %}
         
         <a href="{% url 'announcement-list' %}" class="btn btn-secondary">Назад к списку</a>
 
-        <h2>Отклики</h2>
         {% for response in announcement.responses.all %}
             <div class="card mt-3">
                 <div class="card-body">
@@ -31,14 +31,14 @@
         {% endfor %}
 
         {% if user.is_authenticated %}
-        <h2>Оставить отклик</h2>
-        <form method="post" action="{% url 'response-create' announcement.pk %}">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Отправить отклик</button>
-        </form>
+            <h2>Оставить отклик</h2>
+            <form method="post" action="{% url 'response_create' announcement.pk %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Отправить отклик</button>
+            </form>
         {% else %}
-        <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a> чтобы оставить отклик.</p>
+            <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a> чтобы оставить отклик.</p>
         {% endif %}
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

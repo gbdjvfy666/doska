@@ -15,14 +15,18 @@ from django.utils.html import strip_tags
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse, reverse_lazy
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Response
 from .form import ResponseForm
 from .form import AnnouncementForm, UserRegistrationForm
 from .models import Announcement, Response, Category, Question, Choice
 from .utils import send_confirmation_mail
+from django.views.generic import ListView, DeleteView, UpdateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Response
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import get_object_or_404, redirect
 
 
 User = get_user_model()
@@ -125,40 +129,70 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class ResponseCreateView(LoginRequiredMixin, CreateView):
     model = Response
     form_class = ResponseForm
-    template_name = 'response_form.html'
+    template_name = 'create_response.html'
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.instance.ad_id = self.kwargs['ad_id']
+        form.instance.author = self.request.user
+        form.instance.announcement_id = self.kwargs['announcement_id']  # Передача значения announcement_id
+        form.instance.ad_id = self.kwargs['pk']
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('announcement-detail', kwargs={'pk': self.kwargs['ad_id']})
+        return reverse('announcement-detail', kwargs={'pk': self.kwargs['pk']})
 
-class ResponseAcceptView(View):
-    def get(self, request, pk):
-        response = get_object_or_404(Response, pk=pk)
-        if response.announcement.author == request.user:
-            response.status = 'accepted'
-            response.save()
-            send_notification(response.author, 'Your response has been accepted!')
-        return redirect('user_responses')
-
-class ResponseDeleteView(DeleteView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ad_id'] = self.kwargs['pk']
+        return context
+    
+class ResponseAcceptView(LoginRequiredMixin, UpdateView):
     model = Response
-    success_url = reverse_lazy('user_responses')
+    fields = ['status']
+    template_name = 'app/response_accept.html'
+    success_url = reverse_lazy('user-responses')
+
+    def form_valid(self, form):
+        response = form.save(commit=False)
+        response.status = 'accepted'
+        response.save()
+
+        # Отправка уведомления пользователю, оставившему отклик
+        send_mail(
+            'Your response has been accepted',
+            f'Your response to the announcement "{response.announcement.title}" has been accepted.',
+            settings.DEFAULT_FROM_EMAIL,
+            [response.author.email],
+            fail_silently=False,
+        )
+
+        return super().form_valid(form)
 
     def get_queryset(self):
-        return self.model.objects.filter(announcement__author=self.request.user)
+        return Response.objects.filter(announcement__author=self.request.user)
 
-class UserResponsesListView(ListView):
+class ResponseDeleteView(LoginRequiredMixin, DeleteView):
     model = Response
-    template_name = 'responses/user_responses.html'
+    success_url = reverse_lazy('user-responses')
+
+    def get_queryset(self):
+        return Response.objects.filter(announcement__author=self.request.user)
+
+class UserResponsesListView(LoginRequiredMixin, ListView):
+    model = Response
+    template_name = 'app/user_responses.html'
     context_object_name = 'responses'
 
     def get_queryset(self):
-        return self.model.objects.filter(announcement__author=self.request.user)
+        return Response.objects.filter(announcement__author=self.request.user)
 
+    def get_queryset(self):
+        return Response.objects.filter(ad__author=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ads'] = Ad.objects.filter(author=self.request.user)
+        return context
+    
 class CategoryListView(ListView):
     model = Category
     template_name = 'categories/list.html'
@@ -198,29 +232,6 @@ def send_response_notification(sender, instance, created, **kwargs):
     if created:
         send_notification(instance.author, 'You have received a new response.')
 
-
-from django.shortcuts import render
-from .models import Profile
-
-def profile_view(request):
-    try:
-        profile = Profile.objects.get(user=request.user)
-    except Profile.DoesNotExist:
-        # If the profile doesn't exist, you can either redirect to a create profile page
-        # or render a different template indicating that the profile doesn't exist.
-        # Here, we'll render a template indicating that the profile doesn't exist.
-        return render(request, 'profile_not_found.html')
-    return render(request, 'profile.html', {'profile': profile})
-
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 
 
@@ -274,3 +285,11 @@ def ad_detail(request, ad_id):
     ad = get_object_or_404(Ad, id=ad_id)
     responses = ad.responses.all()
     return render(request, 'ad_detail.html', {'ad': ad, 'responses': responses})
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Response
+
+@login_required
+def response_list(request):
+    responses = Response.objects.filter(user=request.user)
+    return render(request, 'responses/response_list.html', {'responses': responses})
