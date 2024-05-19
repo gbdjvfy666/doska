@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список объявлений</title>
+    <a href="{% url 'home' %}" class="button">Главная</a>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -11,11 +12,13 @@
         <h1>Список объявлений</h1>
         {% if announcements %}
             <div class="list-group">
+                
                 {% for announcement in announcements %}
                     <a href="{% url 'announcement-detail' announcement.pk %}" class="list-group-item list-group-item-action">
                         <h5 class="mb-1">{{ announcement.title }}</h5>
                         <p class="mb-1">{{ announcement.content|truncatewords:20 }}</p>
                         <small>Категория: {{ announcement.category.name }}</small>
+                        
                     </a>
                 {% endfor %}
             </div>
@@ -23,5 +26,6 @@
             <p>Нет объявлений.</p>
         {% endif %}
     </div>
+    
 </body>
 </html>

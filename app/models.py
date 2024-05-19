@@ -39,6 +39,7 @@ class Announcement(models.Model):
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=False)
+    
 
     class Meta:
         swappable = 'AUTH_USER_MODEL'

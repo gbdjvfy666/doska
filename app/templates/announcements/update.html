@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ announcement.title }}</title>
+    <title>Редактирование: {{ announcement.title }}</title>
     <!-- Подключите необходимые CSS, например Bootstrap, если требуется -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
@@ -47,22 +47,17 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>{{ announcement.title }}</h1>
-        <p>{{ announcement.content }}</p>
-        <p>{{ ad.description }}</p>
-        <a href="{% url 'edit_ad' ad.id %}">Редактировать</a>
-        <p>Категория: {{ announcement.category }}</p>
-        <!-- Добавьте другие поля объявления, если требуется -->
-        {% if user == announcement.author %}
-            <a href="{% url 'announcement_update' announcement.pk %}" class="edit-button">Редактировать</a>
-        {% endif %}
-        <a href="{% url 'announcement-list' %}" class="back-button">Назад к списку</a>
+    <div class="container mt-4">
+        <h1>Редактирование: {{ announcement.title }}</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
+
     </div>
-    <!-- Подключите необходимые JS, например jQuery и Bootstrap JS, если требуется -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
-
+</html>

@@ -6,14 +6,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мои отклики</title>
+    <a href="{% url 'home' %}" class="button">Главная</a>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
         <h1>Мои отклики</h1>
+        
         {% if responses %}
             <div class="list-group">
                 {% for response in responses %}
+                <li>
+                    <strong>{{ response.announcement.title }}</strong>
+                    <p>{{ response.text }}</p> <!-- Предполагая, что у отклика есть поле text -->
+                    <p>Статус: {{ response.status }}</p>
+                  </li>
                     <div class="list-group-item">
                         <h5 class="mb-1">{{ response.announcement.title }}</h5>
                         <p class="mb-1">{{ response.content }}</p>

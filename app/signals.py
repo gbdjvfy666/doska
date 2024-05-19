@@ -8,19 +8,19 @@ def send_response_notification(sender, instance, created, **kwargs):
     if created:
         send_mail(
             'Новый отклик на ваше объявление',
-            f'Ваше объявление "{instance.ad.title}" получило новый отклик.',
+            f'Ваше объявление "{instance.announcement.title}" получило новый отклик.',
             'from@example.com',
-            [instance.ad.author.email],
+            [instance.announcement.author.email],
             fail_silently=False,
         )
 
 @receiver(post_save, sender=Response)
 def send_accept_notification(sender, instance, **kwargs):
-    if instance.accepted:
+    if instance.status == 'accepted':
         send_mail(
             'Ваш отклик принят',
-            f'Ваш отклик на объявление "{instance.ad.title}" был принят.',
+            f'Ваш отклик на объявление "{instance.announcement.title}" был принят.',
             'from@example.com',
-            [instance.author.email],
+            [instance.user.email],
             fail_silently=False,
         )

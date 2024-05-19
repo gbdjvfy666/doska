@@ -110,9 +110,9 @@ class AnnouncementUpdateView(UpdateView):
     form_class = AnnouncementForm
     template_name = 'announcements/update.html'
     context_object_name = 'announcement'
-    
+
     def get_success_url(self):
-        return reverse('announcement_detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('announcement-detail', kwargs={'pk': self.object.pk})
 
 class AnnouncementListView(ListView):
     model = Announcement
@@ -132,7 +132,7 @@ class ResponseCreateView(LoginRequiredMixin, CreateView):
     template_name = 'responses/create.html'
 
     def form_valid(self, form):
-        form.instance.author = self.request.user
+        form.instance.user = self.request.user
         form.instance.announcement = get_object_or_404(Announcement, pk=self.kwargs['announcement_id'])
         return super().form_valid(form)
 
@@ -155,7 +155,7 @@ class ResponseAcceptView(LoginRequiredMixin, UpdateView):
             'Your response has been accepted',
             f'Your response to the announcement "{response.announcement.title}" has been accepted.',
             settings.DEFAULT_FROM_EMAIL,
-            [response.author.email],
+            [response.user.email],
             fail_silently=False,
         )
 
@@ -224,7 +224,7 @@ def send_notification(user, message):
 @receiver(post_save, sender=Response)
 def send_response_notification(sender, instance, created, **kwargs):
     if created:
-        send_notification(instance.author, 'You have received a new response.')
+        send_notification(instance.user, 'You have received a new response.')
 
 
 

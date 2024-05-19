@@ -28,5 +28,4 @@ urlpatterns = [
     path('responses/management/', response_management, name='response-management'),
     path('responses/delete/<int:response_id>/', delete_response, name='delete-response'),
     path('responses/accept/<int:response_id>/', accept_response, name='accept-response'),
-    path('confirm-email/<uidb64>/<token>/', confirm_email, name='confirm_email'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

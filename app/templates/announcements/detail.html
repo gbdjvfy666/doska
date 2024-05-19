@@ -15,7 +15,7 @@
         <p>{{ announcement.content }}</p>
         <p>Категория: {{ announcement.category.name }}</p>
 
-        {% if user == announcement.user %}
+        {% if user == announcement.author %}
             <a href="{% url 'announcement_update' announcement.pk %}" class="btn btn-secondary">Редактировать объявление</a>
         {% endif %}
         
@@ -24,6 +24,10 @@
         {% for response in announcement.responses.all %}
             <div class="card mt-3">
                 <div class="card-body">
+                    <li>
+                        <p>{{ response.text }}</p>
+                        <p>Статус: {{ response.status }}</p>
+                      </li>
                     <p>{{ response.content }}</p>
                     <p><small>Автор: {{ response.user.username }}, Дата: {{ response.created_at }}</small></p>
                 </div>
