@@ -62,7 +62,7 @@ class Response(models.Model):
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='responses')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='responses')
     announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, related_name='responses')
     status = models.CharField(max_length=20, choices=(('pending', 'Pending'), ('accepted', 'Accepted')), default='pending')
 
@@ -99,3 +99,29 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.text    
+    
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.message
+    
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.mail import send_mail
+from django.conf import settings
+
+@receiver(post_save, sender=Response)
+def send_response_notification(sender, instance, created, **kwargs):
+    if created:
+        announcement = instance.announcement
+        recipient = announcement.author.email
+        send_mail(
+            'Новый отклик на ваше объявление',
+            f'У вас новый отклик на объявление "{announcement.title}".',
+            settings.DEFAULT_FROM_EMAIL,
+            [recipient],
+        )

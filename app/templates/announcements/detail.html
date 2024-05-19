@@ -32,7 +32,7 @@
 
         {% if user.is_authenticated %}
             <h2>Оставить отклик</h2>
-            <form method="post" action="{% url 'response_create' announcement.pk %}">
+            <form method="post" action="{% url 'create-response' announcement.pk %}">
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit" class="btn btn-primary">Отправить отклик</button>

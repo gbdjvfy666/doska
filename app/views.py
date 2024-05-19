@@ -129,21 +129,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class ResponseCreateView(LoginRequiredMixin, CreateView):
     model = Response
     form_class = ResponseForm
-    template_name = 'create_response.html'
+    template_name = 'responses/create.html'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.announcement_id = self.kwargs['announcement_id']  # Передача значения announcement_id
-        form.instance.ad_id = self.kwargs['pk']
+        form.instance.announcement = get_object_or_404(Announcement, pk=self.kwargs['announcement_id'])
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('announcement-detail', kwargs={'pk': self.kwargs['pk']})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['ad_id'] = self.kwargs['pk']
-        return context
+        return reverse('announcement-detail', kwargs={'pk': self.kwargs['announcement_id']})
     
 class ResponseAcceptView(LoginRequiredMixin, UpdateView):
     model = Response
@@ -293,3 +287,41 @@ from .models import Response
 def response_list(request):
     responses = Response.objects.filter(user=request.user)
     return render(request, 'responses/response_list.html', {'responses': responses})
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Announcement, Response, Notification
+
+@login_required
+def response_management(request):
+    announcements = Announcement.objects.filter(user=request.user)
+    selected_announcement = request.GET.get('announcement')
+    if selected_announcement:
+        responses = Response.objects.filter(announcement__id=selected_announcement)
+    else:
+        responses = Response.objects.filter(announcement__in=announcements)
+
+    context = {
+        'announcements': announcements,
+        'responses': responses,
+    }
+    return render(request, 'responses/response_management.html', context)
+
+@login_required
+def delete_response(request, response_id):
+    response = get_object_or_404(Response, id=response_id, announcement__user=request.user)
+    response.delete()
+    messages.success(request, 'Response deleted successfully.')
+    return redirect('response-management')
+
+@login_required
+def accept_response(request, response_id):
+    response = get_object_or_404(Response, id=response_id, announcement__user=request.user)
+    response.accepted = True
+    response.save()
+    Notification.objects.create(
+        user=response.user,
+        message=f'Your response to "{response.announcement.title}" has been accepted.'
+    )
+    messages.success(request, 'Response accepted successfully.')
+    return redirect('response-management')
