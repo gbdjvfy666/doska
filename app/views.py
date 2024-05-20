@@ -7,8 +7,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_decode
 from django.urls import reverse, reverse_lazy
-from .form import AnnouncementForm, ResponseForm, AdForm
-from .models import Announcement, Response, Ad
+from .form import AnnouncementForm, ResponseForm
+from .models import Announcement, Response
 from .utils import send_notification_email
 from django.views.generic import ListView, DeleteView, UpdateView
 from django.urls import reverse_lazy
@@ -83,39 +83,12 @@ class ResponseCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('announcement-detail', kwargs={'pk': self.kwargs['announcement_id']})
     
-
 class ResponseDeleteView(LoginRequiredMixin, DeleteView):
     model = Response
     success_url = reverse_lazy('user-responses')
 
     def get_queryset(self):
         return Response.objects.filter(announcement__author=self.request.user)
-
-
-def send_notification(user, message):
-    send_mail(
-        'Notification',
-        message,
-        'noreply@example.com',
-        [user.email],
-        fail_silently=False,
-    )
-
-def edit_ad(request, ad_id):
-    ad = get_object_or_404(Ad, id=ad_id)
-    if request.method == 'POST':
-        form = AdForm(request.POST, instance=ad)
-        if form.is_valid():
-            form.save()
-            return redirect('announcement-list', ad_id=ad.id)  
-    else:
-        form = AdForm(instance=ad)
-    return render(request, 'app/edit_ad.html', {'form': form, 'ad': ad})
-    
-def ad_detail(request, ad_id):
-    ad = get_object_or_404(Ad, id=ad_id)
-    responses = ad.responses.all()
-    return render(request, 'ad_detail.html', {'ad': ad, 'responses': responses})
 
 @login_required
 def response_list(request):
@@ -138,8 +111,8 @@ def response_management(request):
     return render(request, 'responses/response_management.html', context)
 
 @login_required
-def delete_response(request, response_pk):
-    response = get_object_or_404(Response, pk=response_pk)
+def delete_response(request, announcement_id):
+    response = get_object_or_404(Response, pk=announcement_id)
     if response.announcement.author != request.user:
         return redirect('announcement-list')
     response.delete()
@@ -147,12 +120,12 @@ def delete_response(request, response_pk):
     return redirect('responses_by_announcement', announcement_pk=response.announcement.pk)
 
 @login_required
-def accept_response(request, response_pk):
-    response = get_object_or_404(Response, pk=response_pk)
+def accept_response(request, announcement_id):
+    response = get_object_or_404(Response, pk=announcement_id)
     if response.announcement.author != request.user:
         return redirect('announcement-list')
-    response.is_accepted = True
+    response.status = 'accepted'
     response.save()
     send_notification_email(response.user.email, response.announcement.title)
     messages.success(request, 'Отклик принят.')
-    return redirect('responses_by_announcement', announcement_pk=response.announcement.pk)
+    return redirect('response-management')

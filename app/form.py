@@ -1,15 +1,10 @@
 from django import forms
-from .models import Announcement, Ad, Response
+from .models import Announcement, Response
 
 class AnnouncementForm(forms.ModelForm):
     class Meta:
         model = Announcement
         fields = ['title', 'content', 'category', 'image', 'video_url']
-
-class AdForm(forms.ModelForm):
-    class Meta:
-        model = Ad
-        fields = ['title']
 
 class ResponseForm(forms.ModelForm):
     class Meta:

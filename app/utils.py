@@ -24,7 +24,7 @@ def send_notification_email(user_email, announcement_title, accepted=False):
         message = f'Ваш отклик на объявление "{announcement_title}" был принят.'
     else:
         subject = 'Новый отклик на ваше объявление'
-        message = f'Вы получили новый отклик на ваше объявление "{announcement_title}". Пожалуйста, проверьте сайт для получения дополнительной информации.'
+        message = f'Вы получили новый отклик на ваше объявление "{announcement_title}".'
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [user_email]
     send_mail(subject, message, email_from, recipient_list)
