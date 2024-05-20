@@ -14,17 +14,28 @@
         <h1>Мои отклики</h1>
         
         {% if responses %}
+        
             <div class="list-group">
                 {% for response in responses %}
+                
                 <li>
                     <strong>{{ response.announcement.title }}</strong>
-                    <p>{{ response.text }}</p> <!-- Предполагая, что у отклика есть поле text -->
+                    <p>{{ response.text }}</p>
                     <p>Статус: {{ response.status }}</p>
                   </li>
                     <div class="list-group-item">
                         <h5 class="mb-1">{{ response.announcement.title }}</h5>
                         <p class="mb-1">{{ response.content }}</p>
                         <small>Дата: {{ response.created_at }}</small>
+                    </div>
+                    <div class="list-group-item">
+                        <h5 class="mb-1">{{ response.announcement.title }}</h5>
+                        <p class="mb-1">{{ response.message }}</p>
+                        <small>Автор: {{ response.user.username }}, Дата: {{ response.created_at }}</small>
+                        <div class="mt-2">
+                            <a href="{% url 'accept-response' response.id %}" class="btn btn-success btn-sm">Принять</a>
+                            <a href="{% url 'delete-response' response.id %}" class="btn btn-danger btn-sm">Удалить</a>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

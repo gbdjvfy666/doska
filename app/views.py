@@ -1,11 +1,8 @@
-from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_decode
 from django.urls import reverse, reverse_lazy
 from .form import AnnouncementForm, ResponseForm
 from .models import Announcement, Response
@@ -26,20 +23,6 @@ def send_response_notification_email(response):
     html_message = render_to_string('response_email.html', {'response': response})
     recipient_list = [response.ad.author.email]
     send_mail(subject, message, None, recipient_list, html_message=html_message)
-
-def confirm_email(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-
-    if user and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        return redirect('login')
-    else:
-        return HttpResponse('Invalid confirmation link or it has expired.')
 
 class AnnouncementCreateView(CreateView):
     model = Announcement
@@ -96,28 +79,13 @@ def response_list(request):
     return render(request, 'responses/response_list.html', {'responses': responses})
 
 @login_required
-def response_management(request):
-    announcements = Announcement.objects.filter(user=request.user)
-    selected_announcement = request.GET.get('announcement')
-    if selected_announcement:
-        responses = Response.objects.filter(announcement__id=selected_announcement)
-    else:
-        responses = Response.objects.filter(announcement__in=announcements)
-
-    context = {
-        'announcements': announcements,
-        'responses': responses,
-    }
-    return render(request, 'responses/response_management.html', context)
-
-@login_required
 def delete_response(request, announcement_id):
     response = get_object_or_404(Response, pk=announcement_id)
     if response.announcement.author != request.user:
         return redirect('announcement-list')
     response.delete()
     messages.success(request, 'Отклик удален.')
-    return redirect('responses_by_announcement', announcement_pk=response.announcement.pk)
+    return redirect('response-list')
 
 @login_required
 def accept_response(request, announcement_id):
