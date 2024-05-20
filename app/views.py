@@ -128,4 +128,4 @@ def accept_response(request, announcement_id):
     response.save()
     send_notification_email(response.user.email, response.announcement.title)
     messages.success(request, 'Отклик принят.')
-    return redirect('response-management')
+    return redirect('response-list')
