@@ -1,41 +1,28 @@
-<!-- templates/responses/response_list.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мои отклики</title>
-    <a href="{% url 'home' %}" class="button">Главная</a>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
         <h1>Мои отклики</h1>
-        
         {% if responses %}
-        
             <div class="list-group">
                 {% for response in responses %}
-                
-                <li>
-                    <strong>{{ response.announcement.title }}</strong>
-                    <p>{{ response.text }}</p>
-                    <p>Статус: {{ response.status }}</p>
-                  </li>
                     <div class="list-group-item">
                         <h5 class="mb-1">{{ response.announcement.title }}</h5>
-                        <p class="mb-1">{{ response.content }}</p>
+                        <p class="mb-1">{{ response.text }}</p>
                         <small>Дата: {{ response.created_at }}</small>
-                    </div>
-                    <div class="list-group-item">
-                        <h5 class="mb-1">{{ response.announcement.title }}</h5>
-                        <p class="mb-1">{{ response.message }}</p>
-                        <small>Автор: {{ response.user.username }}, Дата: {{ response.created_at }}</small>
-                        <div class="mt-2">
-                            <a href="{% url 'accept-response' response.id %}" class="btn btn-success btn-sm">Принять</a>
-                            <a href="{% url 'delete-response' response.id %}" class="btn btn-danger btn-sm">Удалить</a>
-                        </div>
+                        <p>Статус: {{ response.status }}</p>
+                        {% if response.announcement.author == user %}
+                            <div class="mt-2">
+                                <a href="{% url 'accept-response' response.id %}" class="btn btn-success btn-sm">Принять</a>
+                                <a href="{% url 'delete-response' response.id %}" class="btn btn-danger btn-sm">Удалить</a>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>

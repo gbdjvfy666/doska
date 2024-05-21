@@ -78,11 +78,32 @@ def response_list(request):
     responses = Response.objects.filter(user=request.user)
     return render(request, 'responses/response_list.html', {'responses': responses})
 
+# @login_required
+# def delete_response(request, announcement_id):
+#     response = get_object_or_404(Response, pk=announcement_id)
+#     if response.announcement.author != request.user:
+#         return redirect('announcement-list')
+#     response.delete()
+#     messages.success(request, 'Отклик удален.')
+#     return redirect('response-list')
+
+# @login_required
+# def accept_response(request, announcement_id):
+#     response = get_object_or_404(Response, pk=announcement_id)
+#     if response.announcement.author != request.user:
+#         return redirect('announcement-list')
+#     response.status = 'accepted'
+#     response.save()
+#     send_notification_email(response.user.email, response.announcement.title)
+#     messages.success(request, 'Отклик принят.')
+#     return redirect('response-list')
+
 @login_required
 def delete_response(request, announcement_id):
     response = get_object_or_404(Response, pk=announcement_id)
     if response.announcement.author != request.user:
-        return redirect('announcement-list')
+        messages.error(request, 'Вы не имеете права удалять этот отклик.')
+        return redirect('response-list')
     response.delete()
     messages.success(request, 'Отклик удален.')
     return redirect('response-list')
@@ -91,9 +112,10 @@ def delete_response(request, announcement_id):
 def accept_response(request, announcement_id):
     response = get_object_or_404(Response, pk=announcement_id)
     if response.announcement.author != request.user:
-        return redirect('announcement-list')
+        messages.error(request, 'Вы не имеете права принимать этот отклик.')
+        return redirect('response-list')
     response.status = 'accepted'
     response.save()
-    send_notification_email(response.user.email, response.announcement.title)
+    send_notification_email(response.user.email, response.announcement.title, accepted=True)
     messages.success(request, 'Отклик принят.')
     return redirect('response-list')
