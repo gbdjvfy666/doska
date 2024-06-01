@@ -16,10 +16,10 @@
         <p>Категория: {{ announcement.category.name }}</p>
 
         {% if user == announcement.author %}
-            <a href="{% url 'announcement_update' announcement.pk %}" class="btn btn-secondary">Редактировать объявление</a>
+            <a href="{% url 'announcement_update' announcement.pk %}" class="btn btn-primary">Редактировать объявление</a>
         {% endif %}
         
-        <a href="{% url 'announcement-list' %}" class="btn btn-secondary">Назад к списку</a>
+        <a href="{% url 'announcement-list' %}" class="btn btn-primary">Назад к списку</a><hr>
 
         {% for response in announcement.responses.all %}
             <div class="card mt-3">
@@ -31,11 +31,10 @@
                     <p>{{ response.content }}</p>
                     <p><small>Автор: {{ response.user.username }}, Дата: {{ response.created_at }}</small></p>
                 </div>
-            </div>
+            </div><hr>
         {% endfor %}
 
         {% if user.is_authenticated %}
-            <h2>Оставить отклик</h2>
             <form method="post" action="{% url 'create-response' announcement.pk %}">
                 {% csrf_token %}
                 {{ form.as_p }}
@@ -45,8 +44,5 @@
             <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a> чтобы оставить отклик.</p>
         {% endif %}
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
